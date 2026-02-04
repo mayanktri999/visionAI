@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auth_screen.dart';
 
-
-/// ------------------------------------------------------------
 /// DATA MODEL (each onboarding page is fully customizable)
-/// ------------------------------------------------------------
 class OnboardingPageData {
   final String title;
   final String subtitle;
