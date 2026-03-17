@@ -1,13 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'camera_permission_screen.dart';
 
-
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
-  void continueNext(BuildContext context) {
-    // later → Camera permission screen
-    debugPrint("Go to Camera Permission Screen");
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+
+  /// SAVE USER DATA
+  Future<void> saveUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', nameController.text.trim());
+    await prefs.setString('user_email', emailController.text.trim());
+  }
+
+  Future<void> continueNext() async {
+
+    String name = nameController.text.trim();
+    String email = emailController.text.trim();
+
+    // Validate empty fields
+    if (name.isEmpty || email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill all fields"),
+        ),
+      );
+      return;
+    }
+
+
+    await saveUserData();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_logged_in', true);
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const CameraPermissionScreen(),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    super.dispose();
   }
 
   @override
@@ -18,47 +67,20 @@ class AuthScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+
               const Spacer(),
 
-              /// Image (you said you'll add later)
               Image.asset(
                 'lib/assets/images/focus_family.png',
                 height: 260,
-                fit: BoxFit.contain,
-              ),
-
-              const SizedBox(height: 32),
-
-              /// Title
-              const Text(
-                "Focus on what\nmatters.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  height: 1.2,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              /// Subtitle
-              const Text(
-                "arrive safe, every time",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
               ),
 
               const SizedBox(height: 40),
 
-              /// Name field
+
               TextField(
+                controller: nameController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: "Your Name",
@@ -74,8 +96,9 @@ class AuthScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              /// Gmail field
+
               TextField(
+                controller: emailController,
                 style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
@@ -92,32 +115,18 @@ class AuthScreen extends StatelessWidget {
 
               const Spacer(),
 
-              /// Continue button
+
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const CameraPermissionScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: continueNext,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF49494A),
-                    foregroundColor: const Color(0xFFFFFFFF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                   ),
                   child: const Text(
                     "Continue",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18),
                   ),
                 ),
               ),

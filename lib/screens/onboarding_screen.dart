@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth_screen.dart';
 
-/// DATA MODEL (each onboarding page is fully customizable)
 class OnboardingPageData {
   final String title;
   final String subtitle;
@@ -31,9 +30,9 @@ class OnboardingPageData {
   });
 }
 
-/// ------------------------------------------------------------
-/// ONBOARDING SCREEN
-/// ------------------------------------------------------------
+
+
+
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -47,9 +46,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int currentIndex = 0;
   bool isLastPageSettled = false;
 
-  /// ------------------------------------------------------------
-  /// ONBOARDING DATA
-  /// ------------------------------------------------------------
+
+
+
   final List<OnboardingPageData> pages = [
     OnboardingPageData(
       title: "FOCUS ON\nTHE ROAD",
@@ -107,7 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          /// PAGE VIEW
+
           PageView.builder(
             controller: _pageController,
             itemCount: pages.length,
@@ -133,7 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     const SizedBox(height: 60),
 
-                    /// Skip
+
                     if (currentIndex != pages.length - 1)
                       Align(
                         alignment: Alignment.topRight,
@@ -153,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                     const SizedBox(height: 20),
 
-                    /// Title
+
                     Text(
                       page.title,
                       style: TextStyle(
@@ -166,7 +165,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                     const SizedBox(height: 12),
 
-                    /// Subtitle
+
                     Text(
                       page.subtitle,
                       style: TextStyle(
@@ -177,7 +176,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                     const Spacer(),
 
-                    /// Image
+
                     Center(
                       child: Image.asset(
                         page.image,
@@ -193,14 +192,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
           ),
 
-          /// BOTTOM SECTION
+
           Positioned(
             bottom: 40,
             left: 0,
             right: 0,
             child: Column(
               children: [
-                /// Dots
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
@@ -222,7 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                 const SizedBox(height: 20),
 
-                /// Get Started
+
                 if (isLastPageSettled)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),

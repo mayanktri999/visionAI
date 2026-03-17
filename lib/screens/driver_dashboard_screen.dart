@@ -29,18 +29,15 @@ class DriverDashboardScreen extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            /// ------------------------------------------------
-            /// CAMERA PLACEHOLDER (FULL SCREEN)
-            /// ------------------------------------------------
+
             Container(
               width: double.infinity,
               height: double.infinity,
               color: const Color(0xFF2D3135),
             ),
 
-            /// ------------------------------------------------
-            /// PROFILE ICON (TOP RIGHT)
-            /// ------------------------------------------------
+
+
             Positioned(
               top: 16,
               right: 16,
@@ -58,9 +55,7 @@ class DriverDashboardScreen extends StatelessWidget {
               ),
             ),
 
-            /// ------------------------------------------------
-            /// CENTER CAMERA BUTTON
-            /// ------------------------------------------------
+
             Center(
               child: Container(
                 width: 110,
@@ -86,9 +81,8 @@ class DriverDashboardScreen extends StatelessWidget {
               ),
             ),
 
-            /// ------------------------------------------------
-            /// START DETECTION BUTTON (BOTTOM)
-            /// ------------------------------------------------
+
+
             Positioned(
               left: 16,
               right: 16,

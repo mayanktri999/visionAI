@@ -1,18 +1,41 @@
 import 'package:flutter/material.dart';
 import 'driver_dashboard_screen.dart';
-
+import '../utils/permission_helper.dart';
 
 class ModeSelectionScreen extends StatelessWidget {
   const ModeSelectionScreen({super.key});
 
-  void onDriverMode(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const DriverDashboardScreen(),
-      ),
-    );
+
+  void onDriverMode(BuildContext context) async {
+
+    bool cameraGranted =
+    await PermissionHelper.checkCameraPermission();
+
+    bool notificationGranted =
+    await PermissionHelper.checkNotificationPermission();
+
+    if (!cameraGranted) {
+      cameraGranted =
+      await PermissionHelper.requestCameraPermission();
+    }
+
+    if (!notificationGranted) {
+      notificationGranted =
+      await PermissionHelper.requestNotificationPermission();
+    }
+
+    if (cameraGranted && notificationGranted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const DriverDashboardScreen(),
+        ),
+      );
+    } else {
+      print("Permission required");
+    }
   }
+
 
   void onStudyMode(BuildContext context) {
     debugPrint("Study Mode Selected");
@@ -30,7 +53,6 @@ class ModeSelectionScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 24),
 
-              /// ---------------- TITLE ----------------
               const Text(
                 "What do you want to do now?",
                 style: TextStyle(
@@ -42,7 +64,7 @@ class ModeSelectionScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              /// ---------------- DRIVER MODE (IMAGE LEFT) ----------------
+
               _modeCard(
                 context: context,
                 title: "Stay alert while\ndriving",
@@ -53,13 +75,13 @@ class ModeSelectionScreen extends StatelessWidget {
                 ],
                 buttonText: "Driver Mode",
                 imagePath: "lib/assets/images/onboarding_car.png",
-                onPressed: () => onDriverMode(context),
+                onPressed: () => onDriverMode(context), // ✅ NOW WITH PERMISSION
                 imageLeft: true,
               ),
 
               const SizedBox(height: 24),
 
-              /// ---------------- STUDY MODE (IMAGE RIGHT) ----------------
+
               _modeCard(
                 context: context,
                 title: "Stay focused while\nstudying",
@@ -80,9 +102,7 @@ class ModeSelectionScreen extends StatelessWidget {
     );
   }
 
-  /// ======================================================
-  /// MODE CARD (OVERFLOW SAFE)
-  /// ======================================================
+
   Widget _modeCard({
     required BuildContext context,
     required String title,
@@ -101,14 +121,10 @@ class ModeSelectionScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFF3A3E42),
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-
-            ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              /// IMAGE LEFT
               if (imageLeft)
                 Flexible(
                   flex: 4,
@@ -118,7 +134,6 @@ class ModeSelectionScreen extends StatelessWidget {
                   ),
                 ),
 
-              /// TEXT CONTENT
               Expanded(
                 flex: 4,
                 child: Padding(
@@ -136,7 +151,6 @@ class ModeSelectionScreen extends StatelessWidget {
                           height: 1.3,
                         ),
                       ),
-
                       const SizedBox(height: 12),
 
                       ...bullets.map(
@@ -174,7 +188,6 @@ class ModeSelectionScreen extends StatelessWidget {
                 ),
               ),
 
-              /// IMAGE RIGHT
               if (!imageLeft)
                 Flexible(
                   flex: 4,
@@ -190,9 +203,6 @@ class ModeSelectionScreen extends StatelessWidget {
     );
   }
 
-  /// ======================================================
-  /// IMAGE WIDGET
-  /// ======================================================
   Widget _modeImage(String path) {
     return Image.asset(
       path,

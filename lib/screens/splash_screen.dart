@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:visionai/screens/onboarding_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'mode_selection_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -36,10 +38,10 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(milliseconds: 1800),
     );
 
-    /// Start eyeball movement
+
     _eyeBallController.repeat();
 
-    /// STOP eyeball when VisionAI starts appearing
+
     _mainController.addListener(() {
       if (_mainController.value >= 0.55 &&
           _eyeBallController.isAnimating) {
@@ -90,18 +92,29 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _mainController.forward();
-    _mainController.addStatusListener((status) {
+    _mainController.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (!mounted) return;
 
+        final prefs = await SharedPreferences.getInstance();
+        bool isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+
+        if (!mounted) return;
+
+        if (isLoggedIn) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ModeSelectionScreen(),
+            ),
+          );
+        } else {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (_) => const OnboardingScreen(),
             ),
           );
-        });
+        }
       }
     });
 
@@ -125,7 +138,7 @@ class _SplashScreenState extends State<SplashScreen>
             _eyeBallController,
           ]),
           builder: (context, _) {
-            /// 👁 White eyeball motion (exact feel like video)
+
             final double angle = _eyeBallController.value * 2 * pi;
             final double radiusX = 8;
             final double radiusY = 6;
@@ -136,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                /// 👁 Eye
+
                 Transform.translate(
                   offset: Offset(_eyeSlide.value, 0),
                   child: ScaleTransition(
@@ -150,7 +163,7 @@ class _SplashScreenState extends State<SplashScreen>
                           height: 55,
                         ),
 
-                        /// ⚪ White eyeball
+
                         Transform.translate(
                           offset: Offset(eyeBallX, eyeBallY),
                           child: Container(
@@ -167,7 +180,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
 
-                /// 🧠 VisionAI
+
                 Positioned(
                   left: 81 - 95 + _visionSlide.value,
                   child: Opacity(
@@ -180,7 +193,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
 
-                /// 🏷 Tagline
+
                 Positioned(
                   top: 48 + 0.3 + _taglineSlide.value,
                   left: 80 - 77,

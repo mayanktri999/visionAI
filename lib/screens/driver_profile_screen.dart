@@ -1,8 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'mode_selection_screen.dart';
+import 'edit_profile_screen.dart';
 
-class DriverProfileScreen extends StatelessWidget {
+class DriverProfileScreen extends StatefulWidget {
   const DriverProfileScreen({super.key});
+
+  @override
+  State<DriverProfileScreen> createState() => _DriverProfileScreenState();
+}
+
+class _DriverProfileScreenState extends State<DriverProfileScreen> {
+
+  String userName = "";
+  String userEmail = "";
+  File? profileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      userName = prefs.getString('user_name') ?? "User Name";
+      userEmail = prefs.getString('user_email') ?? "user@email.com";
+
+      String? imagePath = prefs.getString('profile_image');
+      if (imagePath != null) {
+        profileImage = File(imagePath);
+      }
+    });
+  }
+
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+    if (picked != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('profile_image', picked.path);
+
+      setState(() {
+        profileImage = File(picked.path);
+      });
+    }
+  }
 
   void onExitDriverMode(BuildContext context) {
     Navigator.pushAndRemoveUntil(
@@ -29,28 +77,50 @@ class DriverProfileScreen extends StatelessWidget {
           "Driver Profile",
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.white),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>  const EditProfileScreen(),
+                ),
+              );
+              loadUserData(); // refresh after edit
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            /// ---------------- PROFILE AVATAR ----------------
-            const CircleAvatar(
-              radius: 42,
-              backgroundColor: Colors.white12,
-              child: Icon(
-                Icons.person,
-                size: 42,
-                color: Colors.white,
+
+
+            GestureDetector(
+              onTap: pickImage,
+              child: CircleAvatar(
+                radius: 42,
+                backgroundColor: Colors.white12,
+                backgroundImage:
+                profileImage != null ? FileImage(profileImage!) : null,
+                child: profileImage == null
+                    ? const Icon(
+                  Icons.person,
+                  size: 42,
+                  color: Colors.white,
+                )
+                    : null,
               ),
             ),
 
             const SizedBox(height: 12),
 
-            /// ---------------- NAME ----------------
-            const Text(
-              "Mayank Tripathi",
-              style: TextStyle(
+
+            Text(
+              userName,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -59,10 +129,10 @@ class DriverProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 4),
 
-            /// ---------------- EMAIL ----------------
-            const Text(
-              "mayank@gmail.com",
-              style: TextStyle(
+
+            Text(
+              userEmail,
+              style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 14,
               ),
@@ -70,7 +140,7 @@ class DriverProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            /// ---------------- OPTIONS ----------------
+
             _profileItem(
               title: "Report Issue",
               iconPath: "lib/assets/icons/report.png",
@@ -86,7 +156,7 @@ class DriverProfileScreen extends StatelessWidget {
 
             const Spacer(),
 
-            /// ---------------- EXIT BUTTON ----------------
+
             SizedBox(
               width: double.infinity,
               height: 52,
@@ -101,7 +171,8 @@ class DriverProfileScreen extends StatelessWidget {
                 child: const Text(
                   "Exit Driver Mode",
                   style: TextStyle(
-                    fontSize: 16,color: Color(0xFFFFFFFF),
+                    fontSize: 16,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -113,7 +184,7 @@ class DriverProfileScreen extends StatelessWidget {
     );
   }
 
-  /// ---------------- PROFILE OPTION TILE ----------------
+
   Widget _profileItem({
     required String title,
     required String iconPath,

@@ -1,7 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-class DrowsinessAlertScreen extends StatelessWidget {
+class DrowsinessAlertScreen extends StatefulWidget {
   const DrowsinessAlertScreen({super.key});
+
+  @override
+  State<DrowsinessAlertScreen> createState() =>
+      _DrowsinessAlertScreenState();
+}
+
+class _DrowsinessAlertScreenState
+    extends State<DrowsinessAlertScreen> {
+
+  final AudioPlayer _player = AudioPlayer();
+
+  @override
+  void initState() {
+    super.initState();
+    playAlarm();
+  }
+
+  Future<void> playAlarm() async {
+    await _player.setReleaseMode(ReleaseMode.loop);
+    await _player.play(AssetSource('audio/alarm.mp3'));
+  }
+
+  Future<void> stopAlarm() async {
+    await _player.stop();
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  void onAwakePressed() async {
+    await stopAlarm();
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +76,7 @@ class DrowsinessAlertScreen extends StatelessWidget {
                 width: 200,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: onAwakePressed,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.redAccent,

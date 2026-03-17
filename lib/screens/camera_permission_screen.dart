@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'notification_permission_screen.dart';
 import 'mode_selection_screen.dart';
+import '../utils/permission_helper.dart';
+
+
 
 
 
@@ -16,14 +19,32 @@ class CameraPermissionScreen extends StatelessWidget {
   }
 
 
-  void onAllow(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const NotificationPermissionScreen(),
-      ),
-    );
+  void onAllow(BuildContext context) async {
+
+    bool granted =
+    await PermissionHelper.checkCameraPermission();
+
+    if (!granted) {
+      granted =
+      await PermissionHelper.requestCameraPermission();
+    }
+
+    if (granted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const NotificationPermissionScreen(),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Camera permission is required"),
+        ),
+      );
+    }
   }
+
 
 
   @override
@@ -36,9 +57,8 @@ class CameraPermissionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              /// ------------------------------------------------
-              /// TOP BAR (Skip)
-              /// ------------------------------------------------
+
+
               Align(
                 alignment: Alignment.topRight,
                 child: TextButton(
@@ -55,11 +75,9 @@ class CameraPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              /// ------------------------------------------------
-              /// IMAGE
-              /// ------------------------------------------------
+
           Transform.translate(
-            offset: const Offset(-20, 0), // 👈 move LEFT (try -10 to -30)
+            offset: const Offset(-20, 0),
             child:    Image.asset(
                 'lib/assets/images/camera_permission.png',
                 height: 220,
@@ -69,9 +87,6 @@ class CameraPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              /// ------------------------------------------------
-              /// TITLE
-              /// ------------------------------------------------
               const Text(
                 "Camera Access\nRequired",
                 textAlign: TextAlign.center,
@@ -85,9 +100,7 @@ class CameraPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              /// ------------------------------------------------
-              /// DESCRIPTION
-              /// ------------------------------------------------
+
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -103,9 +116,7 @@ class CameraPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              /// ------------------------------------------------
-              /// BULLET POINTS
-              /// ------------------------------------------------
+
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -117,10 +128,6 @@ class CameraPermissionScreen extends StatelessWidget {
               ),
 
               const Spacer(),
-
-              /// ------------------------------------------------
-              /// ALLOW BUTTON
-              /// ------------------------------------------------
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -152,9 +159,7 @@ class CameraPermissionScreen extends StatelessWidget {
   }
 }
 
-/// ------------------------------------------------------------
-/// BULLET POINT WIDGET
-/// ------------------------------------------------------------
+
 class PermissionPoint extends StatelessWidget {
   final String text;
 

@@ -2,7 +2,20 @@ import 'package:flutter/material.dart';
 import 'driver_dashboard_screen.dart';
 
 class SummaryScreen extends StatelessWidget {
-  const SummaryScreen({super.key});
+  final Duration duration;
+  final int alerts;
+
+  const SummaryScreen({
+    super.key,
+    required this.duration,
+    required this.alerts,
+  });
+
+  String get formattedDuration {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return "$minutes min $seconds sec";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +27,7 @@ class SummaryScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// CLOSE
+
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
@@ -44,8 +57,8 @@ class SummaryScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              _summaryTile("Duration", "12 min"),
-              _summaryTile("Drowsiness Alerts", "2"),
+              _summaryTile("Duration", formattedDuration),
+              _summaryTile("Drowsiness Alerts", alerts.toString()),
               _summaryTile("Status", "Completed"),
 
               const Spacer(),
@@ -91,13 +104,19 @@ class SummaryScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: const TextStyle(color: Colors.white54, fontSize: 16)),
-          Text(value,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style:
+            const TextStyle(color: Colors.white54, fontSize: 16),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

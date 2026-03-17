@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'mode_selection_screen.dart';
+import '../utils/permission_helper.dart';
+
+
+
 
 
 
@@ -14,14 +18,32 @@ class NotificationPermissionScreen extends StatelessWidget {
     );
   }
 
-  void onAllow(BuildContext context) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const ModeSelectionScreen(),
-      ),
-    );
+  void onAllow(BuildContext context) async {
+
+    bool granted =
+    await PermissionHelper.checkNotificationPermission();
+
+    if (!granted) {
+      granted =
+      await PermissionHelper.requestNotificationPermission();
+    }
+
+    if (granted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ModeSelectionScreen(),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("notification permission is required"),
+        ),
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +54,7 @@ class NotificationPermissionScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              /// ------------------------------------------------
-              /// TOP BAR (Skip)
-              /// ------------------------------------------------
+
               Align(
                 alignment: Alignment.topRight,
                 child: TextButton(
@@ -51,9 +71,7 @@ class NotificationPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              /// ------------------------------------------------
-              /// IMAGE
-              /// ------------------------------------------------
+
               Transform.translate(
                 offset: const Offset(-12, 0), // slight left shift
                 child: Image.asset(
@@ -65,9 +83,6 @@ class NotificationPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              /// ------------------------------------------------
-              /// TITLE
-              /// ------------------------------------------------
               const Text(
                 "Notification\nAccess Required",
                 textAlign: TextAlign.center,
@@ -81,9 +96,6 @@ class NotificationPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              /// ------------------------------------------------
-              /// DESCRIPTION
-              /// ------------------------------------------------
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -98,9 +110,6 @@ class NotificationPermissionScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              /// ------------------------------------------------
-              /// BULLET POINTS
-              /// ------------------------------------------------
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -112,9 +121,7 @@ class NotificationPermissionScreen extends StatelessWidget {
 
               const Spacer(),
 
-              /// ------------------------------------------------
-              /// ALLOW BUTTON
-              /// ------------------------------------------------
+
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -146,9 +153,7 @@ class NotificationPermissionScreen extends StatelessWidget {
   }
 }
 
-/// ------------------------------------------------------------
-/// BULLET POINT WIDGET
-/// ------------------------------------------------------------
+
 class PermissionPoint extends StatelessWidget {
   final String text;
 
